@@ -1,10 +1,8 @@
-use std::{str::FromStr, time};
-
+use chrono::NaiveDateTime;
+use clap::Parser;
 use exitfailure::ExitFailure;
 use reqwest::Url;
 use serde_derive::{Deserialize, Serialize};
-use clap::Parser;
-use chrono::{DateTime, NaiveDateTime};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -45,16 +43,19 @@ impl Forecast {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), ExitFailure>{
+async fn main() -> Result<(), ExitFailure> {
     let args = Args::parse();
     let altitude = args.altitude;
     let longitude = args.longitude;
 
-    println!("\n> Getting weather for the altitude {} and longitude {}", altitude, longitude);
+    println!(
+        "\n> Getting weather for the altitude {} and longitude {}",
+        altitude, longitude
+    );
 
     let response = Forecast::get(longitude, altitude).await?;
 
-    let times  = &response.hourly.time[0..48];
+    let times = &response.hourly.time[0..48];
     let temperatures = &response.hourly.temperature_2m[0..48];
     let windspeeds = &response.hourly.windspeed_80m[0..48];
     for i in 0..48 {
